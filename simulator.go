@@ -10,24 +10,15 @@ type dice []int
 
 func main() {
 
-	var roll dice
-	var points int
-	roll = dice{rollDie(), rollDie(), rollDie(), rollDie(), rollDie(), rollDie()}
+	roll := dice{rollDie(), rollDie(), rollDie(), rollDie(), rollDie(), rollDie()}
 
 	fmt.Println(roll)
-	for i := 1; i < 7; i++ {
-		var occ = countOccurrence(i, roll)
-		var pts = pointsForDice(i, occ)
-		if pts > 0 {
-			fmt.Println("Antall ", i, ": ", occ, " gir ", pts, " poeng")
-			points += pts
-		}
-	}
-	fmt.Println("Totalt: ", points)
+
+	fmt.Println("Totalt: ", getTotal(roll))
 }
 
 func isStraight(dice dice) bool {
-	// Sort array and compare to 1,2,3,4,5,6, or:
+
 	return (countOccurrence(1, dice) == 1 &&
 		countOccurrence(2, dice) == 1 &&
 		countOccurrence(3, dice) == 1 &&
@@ -36,10 +27,62 @@ func isStraight(dice dice) bool {
 		countOccurrence(6, dice) == 1)
 }
 
-func isThreePairs(dice dice) bool {
-	// Make sure there are six dice,
-	// Make sure there are three distinct values
-	return true
+func isThreePairs(roll dice) bool {
+	unique := dice{}
+	count := 0
+	count, unique = countDistinct(roll)
+	return len(roll) == 6 && count == 3 && len(unique) == 3
+
+}
+
+func containsDie(roll dice, faceValue int) bool {
+
+	for _, v := range roll {
+		if v == faceValue {
+			return true
+		}
+	}
+	return false
+
+}
+
+func countDistinct(roll dice) (int, dice) {
+	unique := dice{}
+	skip := false
+	for _, v := range roll {
+		for _, u := range unique {
+			if v == u {
+				skip = true
+			}
+		}
+		if !skip {
+			unique = append(unique, v)
+		} else {
+			skip = false
+		}
+	}
+	return len(unique), unique
+}
+
+func getTotal(dice dice) int {
+	var points int
+	if isStraight(dice) {
+		points = 1500
+		fmt.Printf("Straight! %v\n", dice)
+	} else if isThreePairs(dice) {
+		points = 1000
+		fmt.Printf("Tre par! %v\n", dice)
+	} else {
+
+		for i := 1; i < 7; i++ {
+			var occ = countOccurrence(i, dice)
+			var pts = pointsForDice(i, occ)
+			if pts > 0 {
+				points += pts
+			}
+		}
+	}
+	return points
 }
 
 func pointsForDice(faceValue int, number int) int {
