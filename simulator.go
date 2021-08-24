@@ -24,12 +24,22 @@ func main() {
 		}
 	}
 	fmt.Println("Totalt: ", points)
-	//fmt.Println("Antall enere: ", countOccurrence(1, roll), " gir ", pointsForDice(1, countOccurrence(1, roll)), " poeng")
-	// fmt.Println("Antall toere: ", countOccurrence(2, roll), " gir ", pointsForDice(2, countOccurrence(2, roll)), " poeng")
-	// fmt.Println("Antall treere: ", countOccurrence(3, roll))
-	// fmt.Println("Antall firere: ", countOccurrence(4, roll))
-	// fmt.Println("Antall femmere: ", countOccurrence(5, roll))
-	// fmt.Println("Antall seksere: ", countOccurrence(6, roll))
+}
+
+func isStraight(dice dice) bool {
+	// Sort array and compare to 1,2,3,4,5,6, or:
+	return (countOccurrence(1, dice) == 1 &&
+		countOccurrence(2, dice) == 1 &&
+		countOccurrence(3, dice) == 1 &&
+		countOccurrence(4, dice) == 1 &&
+		countOccurrence(5, dice) == 1 &&
+		countOccurrence(6, dice) == 1)
+}
+
+func isThreePairs(dice dice) bool {
+	// Make sure there are six dice,
+	// Make sure there are three distinct values
+	return true
 }
 
 func pointsForDice(faceValue int, number int) int {
