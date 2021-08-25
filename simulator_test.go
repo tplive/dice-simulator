@@ -128,25 +128,25 @@ func TestGetTotal(t *testing.T) {
 	roll2 := dice{1, 1, 2, 2, 3, 3} // Three pairs - 1000 points
 	roll3 := dice{5, 4, 5, 1, 2, 3} // 200 points
 	roll4 := dice{1, 1, 1, 2, 3, 5} // 1050 points
-	roll5 := dice{5, 2, 4, 5, 2, 2} // 300 points
+	roll5 := dice{5, 2, 5, 2, 2}    // 300 points
 
-	sum = getPoints(roll)
+	sum, _ = getPoints(roll)
 	if sum != 1500 {
 		t.Errorf("Sum should be 1500, was: %v", sum)
 	}
-	sum = getPoints(roll2)
+	sum, _ = getPoints(roll2)
 	if sum != 1000 {
 		t.Errorf("Sum should be 1000, was: %v", sum)
 	}
-	sum = getPoints(roll3)
+	sum, _ = getPoints(roll3)
 	if sum != 200 {
 		t.Errorf("Sum should be 200, was: %v", sum)
 	}
-	sum = getPoints(roll4)
+	sum, _ = getPoints(roll4)
 	if sum != 1050 {
 		t.Errorf("Sum should be 1050, was: %v", sum)
 	}
-	sum = getPoints(roll5)
+	sum, _ = getPoints(roll5)
 	if sum != 300 {
 		t.Errorf("Sum should be 300, was: %v", sum)
 	}
