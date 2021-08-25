@@ -17,25 +17,40 @@ func main() {
 func playRound() int {
 	sum := 0
 	round := 1
+	dice := 6
 	for sum < 10000 {
+		if round > 50 {
+			break
+		}
+		// "remaining" is how many dice are left after keeping points. Decide if we should roll again,
+		// or keep the points.
+		// Also, if they all gave points, always roll again!
 
-		points, roll := rollOnce(rollDice(6))
-		sum += points
-		fmt.Printf("%v = %v pts  -> %v\n", sortDice(roll), points, sum)
+		for dice > 2 || dice == 0 {
+			points, roll, remaining := rollOnce(rollDice(dice))
+			if points == 0 {
+				break
+			} else {
+				dice = remaining
+				sum += points
+				fmt.Printf("%v -> %v -> ", points, sortDice(roll))
+			}
+		}
+
+		fmt.Printf(" -> %v\n", sum)
 
 		round++
 	}
 	return round
 }
 
-func rollOnce(roll dice) (int, dice) {
-	poeng := getPoints(roll)
+func rollOnce(roll dice) (int, dice, int) {
+	poeng, remaining := getPoints(roll)
 
-	return poeng, roll
+	return poeng, roll, remaining
 }
 
 func isStraight(dice dice) bool {
-
 	return (countOccurrence(1, dice) == 1 &&
 		countOccurrence(2, dice) == 1 &&
 		countOccurrence(3, dice) == 1 &&
@@ -52,7 +67,14 @@ func isThreePairs(roll dice) bool {
 
 func isYatzy(roll dice) bool {
 	roll = sortDice(roll)
-	return roll[0] == roll[len(roll)-1]
+	equal := true
+	for i := range roll {
+		if roll[0] != roll[i] {
+			equal = false
+			break
+		}
+	}
+	return equal
 }
 
 func sortDice(roll dice) dice {
@@ -99,24 +121,29 @@ func countDistinct(roll dice) (int, dice) {
 	return len(unique), unique
 }
 
-func getPoints(roll dice) int {
+func getPoints(roll dice) (int, int) {
 	points := 0
+	remaining := len(roll)
 	if isYatzy(roll) {
 		points = 10000
+		remaining = 0
 	} else if isStraight(roll) {
 		points = 1500
+		remaining = 0
 	} else if isThreePairs(roll) {
 		points = 1000
+		remaining = 0
 	} else {
-		for i := 1; i <= len(roll); i++ {
+		for i := 1; i < 7; i++ {
 			var occ = countOccurrence(i, roll)
 			var pts = pointsForDice(i, occ)
 			if pts > 0 {
 				points += pts
+				remaining -= occ
 			}
 		}
 	}
-	return points
+	return points, remaining
 }
 
 func pointsForDice(faceValue int, number int) int {
@@ -210,7 +237,7 @@ func rollDie() int {
 
 func rollDice(numberToRoll int) dice {
 	roll := dice{}
-	for i := 0; i <= numberToRoll; i++ {
+	for i := 0; i < numberToRoll; i++ {
 		roll = append(roll, rollDie())
 	}
 	return roll
