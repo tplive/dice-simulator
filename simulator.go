@@ -33,6 +33,7 @@ func rollOnce(roll dice) (int, dice) {
 
 	return poeng, roll
 }
+
 func isStraight(dice dice) bool {
 
 	return (countOccurrence(1, dice) == 1 &&
