@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"time"
 )
 
@@ -10,13 +11,26 @@ type dice []int
 
 func main() {
 
-	roll := dice{rollDie(), rollDie(), rollDie(), rollDie(), rollDie(), rollDie()}
+	sum := 0
+	runder := 1
+	for sum <= 10000 {
 
-	fmt.Println(roll)
+		sum += RollOnce()
+		fmt.Println("Totalt: ", sum)
+		runder++
+	}
+	fmt.Println("Antall runder: ", runder)
 
-	fmt.Println("Totalt: ", getTotal(roll))
 }
 
+func RollOnce() int {
+	roll := dice{rollDie(), rollDie(), rollDie(), rollDie(), rollDie(), rollDie()}
+	fmt.Println(sortDice(roll))
+	poeng := getTotal(roll)
+	fmt.Println("Poeng for kast: ", poeng)
+
+	return poeng
+}
 func isStraight(dice dice) bool {
 
 	return (countOccurrence(1, dice) == 1 &&
@@ -28,54 +42,75 @@ func isStraight(dice dice) bool {
 }
 
 func isThreePairs(roll dice) bool {
-	unique := dice{}
-	count := 0
-	count, unique = countDistinct(roll)
-	return len(roll) == 6 && count == 3 && len(unique) == 3
-
+	count, unique := countDistinct(roll)
+	roll = sortDice(roll)
+	return len(roll) == 6 && count == 3 && len(unique) == 3 && roll[0] == roll[1] && roll[1] != roll[2] && roll[2] == roll[3] && roll[3] != roll[4] && roll[4] == roll[5]
 }
 
-func containsDie(roll dice, faceValue int) bool {
+func isYatzy(roll dice) bool {
+	roll = sortDice(roll)
+	return roll[0] == roll[len(roll)-1]
+}
 
-	for _, v := range roll {
-		if v == faceValue {
-			return true
+func sortDice(roll dice) dice {
+	sort.Slice(roll, func(i, j int) bool { return roll[i] < roll[j] })
+	return roll
+}
+
+func countNonZero(roll dice) int {
+	count := 0
+	for _, r := range roll {
+		if r != 0 {
+			count++
 		}
 	}
-	return false
+	return count
+}
 
+func returnNonZero(roll dice) dice {
+	nonZero := dice{}
+	for _, r := range roll {
+		if r != 0 {
+			nonZero = append(nonZero, r)
+		}
+	}
+	return nonZero
 }
 
 func countDistinct(roll dice) (int, dice) {
+	// Return the number of distinct values as well as a dice array of those values
 	unique := dice{}
-	skip := false
+	exists := false
 	for _, v := range roll {
 		for _, u := range unique {
 			if v == u {
-				skip = true
+				exists = true
 			}
 		}
-		if !skip {
+		if !exists {
 			unique = append(unique, v)
 		} else {
-			skip = false
+			exists = false
 		}
 	}
 	return len(unique), unique
 }
 
-func getTotal(dice dice) int {
+func getTotal(roll dice) int {
 	var points int
-	if isStraight(dice) {
+	if isYatzy(roll) {
+		points = 10000
+		fmt.Printf("YATZY! %v\n", roll)
+	} else if isStraight(roll) {
 		points = 1500
-		fmt.Printf("Straight! %v\n", dice)
-	} else if isThreePairs(dice) {
+		fmt.Printf("Straight! %v\n", roll)
+	} else if isThreePairs(roll) {
 		points = 1000
-		fmt.Printf("Tre par! %v\n", dice)
+		fmt.Printf("Tre par! %v\n", roll)
 	} else {
 
 		for i := 1; i < 7; i++ {
-			var occ = countOccurrence(i, dice)
+			var occ = countOccurrence(i, roll)
 			var pts = pointsForDice(i, occ)
 			if pts > 0 {
 				points += pts
