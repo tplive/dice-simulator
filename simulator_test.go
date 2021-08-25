@@ -121,8 +121,7 @@ func TestIsThreePairs(t *testing.T) {
 	}
 }
 
-func TestGetTotal(t *testing.T) {
-	sum := 0
+func TestGetPoints(t *testing.T) {
 
 	roll := dice{1, 2, 3, 4, 5, 6}  // Straight - 1500 points
 	roll2 := dice{1, 1, 2, 2, 3, 3} // Three pairs - 1000 points
@@ -130,7 +129,7 @@ func TestGetTotal(t *testing.T) {
 	roll4 := dice{1, 1, 1, 2, 3, 5} // 1050 points
 	roll5 := dice{5, 2, 5, 2, 2}    // 300 points
 
-	sum, _ = getPoints(roll)
+	sum, _ := getPoints(roll)
 	if sum != 1500 {
 		t.Errorf("Sum should be 1500, was: %v", sum)
 	}
@@ -149,6 +148,13 @@ func TestGetTotal(t *testing.T) {
 	sum, _ = getPoints(roll5)
 	if sum != 300 {
 		t.Errorf("Sum should be 300, was: %v", sum)
+	}
+}
+func TestGetPointsAndRemaining(t *testing.T) {
+
+	sum6, rem6 := getPoints(dice{1, 1, 1, 5})
+	if sum6 != 1050 || rem6 != 0 {
+		t.Errorf("Sum should be 1050, was: %v, rem should be 0, was %v", sum6, rem6)
 	}
 
 }
