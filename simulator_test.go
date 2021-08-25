@@ -25,6 +25,23 @@ func TestIsStraight(t *testing.T) {
 	}
 }
 
+func TestIsYatzy(t *testing.T) {
+	roll := dice{1, 1, 1, 1, 1, 1}
+	roll2 := dice{4, 4, 4, 4, 4, 4}
+	roll3 := dice{6, 5, 4, 3, 2, 1}
+
+	if !isYatzy(roll) {
+		t.Errorf("Input is Yatzy: %v", roll)
+	}
+
+	if !isYatzy(roll2) {
+		t.Errorf("Input is Yatzy: %v", roll2)
+	}
+
+	if isYatzy(roll3) {
+		t.Errorf("Input is not a Yatzy: %v", roll3)
+	}
+}
 func TestCountDistinct(t *testing.T) {
 	dist := 0
 	roll2 := dice{1, 1, 2, 2, 3, 3}
@@ -44,6 +61,42 @@ func TestCountDistinct(t *testing.T) {
 		t.Errorf("Input has 4 unique values, test should pass. Distinct was %v", dist)
 	}
 
+}
+
+func TestReturnNonZero(t *testing.T) {
+	roll := dice{1, 1, 2, 2, 3, 3}
+	roll2 := dice{0, 2, 0, 3, 0, 1}
+	roll3 := dice{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	if len(returnNonZero(roll)) != 6 {
+		t.Errorf("No values are zero: %v", roll)
+	}
+
+	if len(returnNonZero(roll2)) != 3 {
+		t.Errorf("Three values are zero: %v", roll)
+	}
+
+	if len(returnNonZero(roll3)) != 0 {
+		t.Errorf("All values are zero: %v", roll)
+	}
+}
+
+func TestCountNonZero(t *testing.T) {
+	roll := dice{1, 1, 2, 2, 3, 3}
+	roll2 := dice{0, 2, 0, 3, 0, 1}
+	roll3 := dice{0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	if countNonZero(roll) != 6 {
+		t.Errorf("No values are zero: %v", roll)
+	}
+
+	if countNonZero(roll2) != 3 {
+		t.Errorf("Three values are zero: %v", roll)
+	}
+
+	if countNonZero(roll3) != 0 {
+		t.Errorf("All values are zero: %v", roll)
+	}
 }
 func TestIsThreePairs(t *testing.T) {
 	roll := dice{1, 2, 3, 4, 5, 6}
