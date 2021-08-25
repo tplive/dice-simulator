@@ -11,25 +11,27 @@ type dice []int
 
 func main() {
 
-	sum := 0
-	runder := 1
-	for sum <= 10000 {
-
-		sum += RollOnce()
-		fmt.Println("Totalt: ", sum)
-		runder++
-	}
-	fmt.Println("Antall runder: ", runder)
-
+	fmt.Println("Antall runder: ", playRound())
 }
 
-func RollOnce() int {
-	roll := dice{rollDie(), rollDie(), rollDie(), rollDie(), rollDie(), rollDie()}
-	fmt.Println(sortDice(roll))
-	poeng := getTotal(roll)
-	fmt.Println("Poeng for kast: ", poeng)
+func playRound() int {
+	sum := 0
+	round := 1
+	for sum < 10000 {
 
-	return poeng
+		points, roll := rollOnce(rollDice(6))
+		sum += points
+		fmt.Printf("%v = %v pts  -> %v\n", sortDice(roll), points, sum)
+
+		round++
+	}
+	return round
+}
+
+func rollOnce(roll dice) (int, dice) {
+	poeng := getPoints(roll)
+
+	return poeng, roll
 }
 func isStraight(dice dice) bool {
 
@@ -96,20 +98,16 @@ func countDistinct(roll dice) (int, dice) {
 	return len(unique), unique
 }
 
-func getTotal(roll dice) int {
-	var points int
+func getPoints(roll dice) int {
+	points := 0
 	if isYatzy(roll) {
 		points = 10000
-		fmt.Printf("YATZY! %v\n", roll)
 	} else if isStraight(roll) {
 		points = 1500
-		fmt.Printf("Straight! %v\n", roll)
 	} else if isThreePairs(roll) {
 		points = 1000
-		fmt.Printf("Tre par! %v\n", roll)
 	} else {
-
-		for i := 1; i < 7; i++ {
+		for i := 1; i <= len(roll); i++ {
 			var occ = countOccurrence(i, roll)
 			var pts = pointsForDice(i, occ)
 			if pts > 0 {
@@ -207,4 +205,12 @@ func countOccurrence(value int, dice dice) int {
 func rollDie() int {
 	rand.Seed(time.Now().UnixNano())
 	return rand.Intn(6) + 1
+}
+
+func rollDice(numberToRoll int) dice {
+	roll := dice{}
+	for i := 0; i <= numberToRoll; i++ {
+		roll = append(roll, rollDie())
+	}
+	return roll
 }
