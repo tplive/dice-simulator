@@ -1,4 +1,4 @@
-package main
+package simulator
 
 import "testing"
 
@@ -29,6 +29,8 @@ func TestIsYatzy(t *testing.T) {
 	roll := dice{1, 1, 1, 1, 1, 1}
 	roll2 := dice{4, 4, 4, 4, 4, 4}
 	roll3 := dice{6, 5, 4, 3, 2, 1}
+	roll4 := dice{6, 5, 4, 3}
+	roll5 := dice{1, 1, 1}
 
 	if !isYatzy(roll) {
 		t.Errorf("Input is Yatzy: %v", roll)
@@ -40,6 +42,14 @@ func TestIsYatzy(t *testing.T) {
 
 	if isYatzy(roll3) {
 		t.Errorf("Input is not a Yatzy: %v", roll3)
+	}
+
+	if isYatzy(roll4) {
+		t.Errorf("Input is not a Yatzy: %v", roll4)
+	}
+
+	if isYatzy(roll5) {
+		t.Errorf("Input is not a Yatzy: %v", roll5)
 	}
 }
 func TestCountDistinct(t *testing.T) {

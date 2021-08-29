@@ -1,4 +1,4 @@
-package main
+package simulator
 
 import (
 	"fmt"
@@ -9,39 +9,73 @@ import (
 
 type dice []int
 
-func main() {
-
-	fmt.Println("Antall runder: ", playRound())
+type GameData struct {
+	round      int
+	points     int
+	whenToQuit int
 }
 
-func playRound() int {
-	sum := 0
-	round := 1
-	dice := 6
-	for sum < 10000 {
-		if round > 50 {
-			break
+func (s *GameData) GetRounds() int {
+	return s.round
+}
+
+func (s *GameData) GetPoints() int {
+	return s.points
+}
+
+func (s *GameData) SetWhenToQuit(q int) {
+	s.whenToQuit = q
+}
+
+func (s *GameData) PlayRounds() {
+	s.points = 0
+	pointsThisRound := 0
+	s.round = 1
+	for s.points <= 10000 || s.round <= 50 {
+
+		fmt.Printf("R%v ", s.round)
+		pointsThisRound = s.playRound()
+
+		// You need 1000 to enter the game
+		if !(s.points == 0 && pointsThisRound < 1000) {
+			s.points += pointsThisRound
 		}
-		// "remaining" is how many dice are left after keeping points. Decide if we should roll again,
-		// or keep the points.
-		// Also, if they all gave points, always roll again!
 
-		for dice > 2 || dice == 0 {
-			points, roll, remaining := rollOnce(rollDice(dice))
-			if points == 0 {
-				break
-			} else {
-				dice = remaining
-				sum += points
-				fmt.Printf("%v -> %v -> ", points, sortDice(roll))
-			}
-		}
-
-		fmt.Printf(" -> %v\n", sum)
-
-		round++
+		s.round++
 	}
-	return round
+}
+
+func (s *GameData) playRound() int {
+	var rollPoints, remaining int
+	endGame := false
+	var roll = dice{}
+	remaining = 6
+
+	for !endGame {
+		rollPoints, roll, remaining = rollOnce(rollDice(remaining))
+
+		if rollPoints == 0 {
+			endGame = true
+			s.points = 0
+		} else if rollPoints > 0 && remaining == 0 {
+			remaining = 6
+			s.points += rollPoints
+		} else if rollPoints > 0 && remaining <= s.whenToQuit {
+			endGame = true
+			s.points += rollPoints
+		} else {
+			s.points += rollPoints
+		}
+		fmt.Printf("%v = %vpts ", roll, rollPoints)
+	}
+
+	fmt.Printf("=> %vpts\n", s.points)
+
+	return rollPoints
+}
+
+func PlayAgain(dice int, round int) bool {
+	return (dice > 2 || dice == 0) && round < 50
 }
 
 func rollOnce(roll dice) (int, dice, int) {
@@ -66,12 +100,17 @@ func isThreePairs(roll dice) bool {
 }
 
 func isYatzy(roll dice) bool {
-	roll = sortDice(roll)
-	equal := true
-	for i := range roll {
-		if roll[0] != roll[i] {
-			equal = false
-			break
+	equal := false
+	if len(roll) < 6 {
+		equal = false
+	} else {
+		roll = sortDice(roll)
+		equal = true
+		for i := range roll {
+			if roll[0] != roll[i] {
+				equal = false
+				break
+			}
 		}
 	}
 	return equal
