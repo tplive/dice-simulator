@@ -59,36 +59,40 @@ func (s *GameData) PlayRounds() {
 }
 
 func (s *GameData) playRound(whenToQuit int) int {
-	var rollPoints, remaining int
+	var rollPoints, subTotal, remaining int
 	endGame := false
 	var roll = dice{}
 	remaining = 6
 
-	for !endGame {
+	for {
 		rollPoints, roll, remaining = rollOnce(rollDice(remaining))
 		if s.total >= 1000 {
 			whenToQuit = s.whenToQuit
 		}
 		if rollPoints == 0 {
 			endGame = true
-			s.points = 0
+			subTotal = 0
 		} else if rollPoints > 0 && remaining == 0 {
 			remaining = 6
-			s.points += rollPoints
+			subTotal += rollPoints
 		} else if rollPoints > 0 && remaining <= whenToQuit {
 			endGame = true
-			s.points += rollPoints
+			subTotal += rollPoints
 		} else {
-			s.points += rollPoints
+			subTotal += rollPoints
 
-			if s.total == 0 && s.points >= 1000 {
+			if s.total == 0 && subTotal >= 1000 {
+				s.total += subTotal
 				endGame = true
 			}
 		}
-		fmt.Printf("%v = %vpts ", roll, s.points)
+		fmt.Printf("%v = %vpts ", roll, subTotal)
+		if endGame {
+			break
+		}
 	}
 
-	fmt.Printf("=> %vpts\n", s.points)
+	fmt.Printf("=> %vpts\n", s.total)
 
 	return rollPoints
 }
