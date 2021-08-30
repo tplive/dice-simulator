@@ -65,7 +65,6 @@ func (s *GameData) PlayRounds() {
 
 		s.round++
 	}
-	s.ResetSimulator()
 }
 
 func (s *GameData) playRound(whenToQuit int) int {
