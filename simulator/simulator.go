@@ -12,6 +12,7 @@ type dice []int
 type GameData struct {
 	round      int
 	points     int
+	total      int
 	whenToQuit int
 }
 
@@ -19,33 +20,45 @@ func (s *GameData) GetRounds() int {
 	return s.round
 }
 
-func (s *GameData) GetPoints() int {
-	return s.points
+func (s *GameData) GetTotalPoints() int {
+	return s.total
 }
 
 func (s *GameData) SetWhenToQuit(q int) {
 	s.whenToQuit = q
 }
 
+func (s *GameData) AddPointsToTotal(p int) {
+	s.total += p
+}
+
 func (s *GameData) PlayRounds() {
-	s.points = 0
 	pointsThisRound := 0
 	s.round = 1
-	for s.points <= 10000 || s.round <= 50 {
-
+	whenToQuit := s.whenToQuit
+	for s.total <= 10000 {
+		if s.round > 50 {
+			fmt.Printf("No more than 50 rounds plz..\n")
+			break
+		}
+		if s.total < 1000 {
+			whenToQuit = 0
+		} else {
+			whenToQuit = s.whenToQuit
+		}
 		fmt.Printf("R%v ", s.round)
-		pointsThisRound = s.playRound()
+		pointsThisRound = s.playRound(whenToQuit)
 
 		// You need 1000 to enter the game
-		if !(s.points == 0 && pointsThisRound < 1000) {
-			s.points += pointsThisRound
+		if !(s.total == 0 && pointsThisRound > 1000) {
+			s.AddPointsToTotal(pointsThisRound)
 		}
 
 		s.round++
 	}
 }
 
-func (s *GameData) playRound() int {
+func (s *GameData) playRound(whenToQuit int) int {
 	var rollPoints, remaining int
 	endGame := false
 	var roll = dice{}
@@ -53,29 +66,31 @@ func (s *GameData) playRound() int {
 
 	for !endGame {
 		rollPoints, roll, remaining = rollOnce(rollDice(remaining))
-
+		if s.total >= 1000 {
+			whenToQuit = s.whenToQuit
+		}
 		if rollPoints == 0 {
 			endGame = true
 			s.points = 0
 		} else if rollPoints > 0 && remaining == 0 {
 			remaining = 6
 			s.points += rollPoints
-		} else if rollPoints > 0 && remaining <= s.whenToQuit {
+		} else if rollPoints > 0 && remaining <= whenToQuit {
 			endGame = true
 			s.points += rollPoints
 		} else {
 			s.points += rollPoints
+
+			if s.total == 0 && s.points >= 1000 {
+				endGame = true
+			}
 		}
-		fmt.Printf("%v = %vpts ", roll, rollPoints)
+		fmt.Printf("%v = %vpts ", roll, s.points)
 	}
 
 	fmt.Printf("=> %vpts\n", s.points)
 
 	return rollPoints
-}
-
-func PlayAgain(dice int, round int) bool {
-	return (dice > 2 || dice == 0) && round < 50
 }
 
 func rollOnce(roll dice) (int, dice, int) {
