@@ -11,9 +11,13 @@ type dice []int
 
 type GameData struct {
 	round      int
-	points     int
 	total      int
 	whenToQuit int
+	minToKeep  int
+}
+
+func (s *GameData) SetMinToKeep(k int) {
+	s.minToKeep = k
 }
 
 func (s *GameData) GetRounds() int {
@@ -75,7 +79,7 @@ func (s *GameData) playRound(whenToQuit int) int {
 		} else if rollPoints > 0 && remaining == 0 {
 			remaining = 6
 			subTotal += rollPoints
-		} else if rollPoints > 0 && remaining <= whenToQuit {
+		} else if rollPoints > s.minToKeep && remaining <= whenToQuit {
 			endGame = true
 			subTotal += rollPoints
 		} else {
