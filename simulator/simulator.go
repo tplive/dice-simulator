@@ -36,6 +36,11 @@ func (s *GameData) AddPointsToTotal(p int) {
 	s.total += p
 }
 
+func (s *GameData) ResetSimulator() {
+	s.round = 1
+	s.total = 0
+}
+
 func (s *GameData) PlayRounds() {
 	pointsThisRound := 0
 	s.round = 1
@@ -60,6 +65,7 @@ func (s *GameData) PlayRounds() {
 
 		s.round++
 	}
+	s.ResetSimulator()
 }
 
 func (s *GameData) playRound(whenToQuit int) int {
