@@ -168,3 +168,30 @@ func TestGetPointsAndRemaining(t *testing.T) {
 	}
 
 }
+
+func TestCountPoints(t *testing.T) {
+	roll1 := dice{1, 2, 3, 4, 5, 6} // Should yield 1500 pts
+	roll2 := dice{3, 4, 2, 3, 6, 4} // Should yield 0 pts
+	roll3 := dice{1, 1, 1, 2, 3, 5} // Should yield 1050
+
+	sum, rem := getPoints(roll1)
+
+	if sum != 1500 {
+		t.Errorf("Sum would be 1500, was %v for a straight", sum)
+	} else if rem != 0 {
+		t.Errorf("Remaining should be 0, was %v for a straight", rem)
+	}
+	var sum2 int
+	sum2, _ = getPoints(roll2) // Should add 1500 to previous sum
+	sum += sum2
+	if sum != 1500 {
+		t.Errorf("Sum would still be 1500, was %v after summing", sum)
+	}
+
+	var sum3 int
+	sum3, rem = getPoints(roll3)
+	sum += sum3
+	if sum != 2550 {
+		t.Errorf("Sum should now be 2550, was %v after summing", sum)
+	}
+}
