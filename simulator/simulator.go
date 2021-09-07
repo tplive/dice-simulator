@@ -307,5 +307,5 @@ func rollDice(numberToRoll int) dice {
 	for i := 0; i < numberToRoll; i++ {
 		roll = append(roll, rollDie())
 	}
-	return roll
+	return sortDice(roll)
 }
