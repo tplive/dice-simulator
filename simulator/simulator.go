@@ -50,11 +50,14 @@ func (s *GameData) PlayRounds() {
 			fmt.Printf("No more than 50 rounds plz..\n")
 			break
 		}
-		if s.total < 1000 {
+
+		// If we are not in the game yet, go hard!
+		if s.total == 0 && pointsThisRound < 1000 {
 			whenToQuit = 0
 		} else {
 			whenToQuit = s.whenToQuit
 		}
+
 		fmt.Printf("R%v ", s.round)
 		pointsThisRound = s.playRound(whenToQuit)
 
@@ -68,40 +71,50 @@ func (s *GameData) PlayRounds() {
 }
 
 func (s *GameData) playRound(whenToQuit int) int {
-	var rollPoints, subTotal, remaining int
-	endGame := false
+	var rollPoints, accPoints, remaining int
+	endRound := false
 	var roll = dice{}
 	remaining = 6
 
 	for {
 		rollPoints, roll, remaining = rollOnce(rollDice(remaining))
+
+		// If we are already in the game, know when to quit
 		if s.total >= 1000 {
 			whenToQuit = s.whenToQuit
 		}
-		if rollPoints == 0 {
-			endGame = true
-			subTotal = 0
-		} else if rollPoints > 0 && remaining == 0 {
-			remaining = 6
-			subTotal += rollPoints
-		} else if rollPoints > s.minToKeep && remaining <= whenToQuit {
-			endGame = true
-			subTotal += rollPoints
-		} else {
-			subTotal += rollPoints
 
-			if s.total == 0 && subTotal >= 1000 {
-				s.total += subTotal
-				endGame = true
-			}
+		if rollPoints == 0 {
+			// If we get no points, wipe the accumulated points and end the round
+			accPoints = 0
+			endRound = true
+		} else if s.total == 0 && accPoints+rollPoints >= 1000 {
+			// If we just got in this round, play it safe and finish up
+			accPoints += rollPoints
+			endRound = true
+		} else if s.total > 1000 && accPoints >= s.minToKeep && remaining <= whenToQuit {
+			// if we are already in, have the minimum we want to keep, and we have fewer die remaining than we need to go on, then end the round
+			accPoints += rollPoints
+			endRound = true
+		} else if rollPoints > 0 && remaining == 0 {
+			// but if we got some points, and all dice yield points, we can keep the points and roll again!
+			remaining = 6
+			accPoints += rollPoints
+		} else if rollPoints > 0 {
+			accPoints += rollPoints
 		}
-		fmt.Printf("%v = %vpts ", roll, subTotal)
-		if endGame {
+
+		if endRound {
+			// When we end the round, we add points (if any) to the total
+			s.AddPointsToTotal(accPoints)
+			fmt.Printf(" %v gir %vpts = %vpts", roll, rollPoints, accPoints)
+			fmt.Printf(" => %vpts\n", s.total)
 			break
+		} else {
+			// if we got some points, but aren't ready to quit yet, accumulate and keep going
+			fmt.Printf(" %v gir %vpts = %vpts", roll, rollPoints, accPoints)
 		}
 	}
-
-	fmt.Printf("=> %vpts\n", s.total)
 
 	return rollPoints
 }
@@ -226,8 +239,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 2000
 		} else if number == 5 {
 			points += 4000
-		} else if number == 6 {
-			points += 8000
 		}
 	} else if faceValue == 2 {
 		if number == 3 {
@@ -236,8 +247,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 400
 		} else if number == 5 {
 			points += 800
-		} else if number == 6 {
-			points += 1600
 		}
 	} else if faceValue == 3 {
 		if number == 3 {
@@ -246,8 +255,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 600
 		} else if number == 5 {
 			points += 1200
-		} else if number == 6 {
-			points += 2400
 		}
 	} else if faceValue == 4 {
 		if number == 3 {
@@ -256,8 +263,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 800
 		} else if number == 5 {
 			points += 1600
-		} else if number == 6 {
-			points += 3200
 		}
 	} else if faceValue == 5 {
 		if number == 1 {
@@ -270,8 +275,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 1000
 		} else if number == 5 {
 			points += 2000
-		} else if number == 6 {
-			points += 4000
 		}
 	} else if faceValue == 6 {
 		if number == 3 {
@@ -280,8 +283,6 @@ func pointsForDice(faceValue int, number int) int {
 			points += 1200
 		} else if number == 5 {
 			points += 2400
-		} else if number == 6 {
-			points += 4800
 		}
 	}
 	return points
