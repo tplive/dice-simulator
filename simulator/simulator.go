@@ -39,32 +39,21 @@ func (s *GameData) AddPointsToTotal(p int) {
 func (s *GameData) ResetSimulator() {
 	s.round = 1
 	s.total = 0
+
 }
 
 func (s *GameData) PlayRounds() {
-	pointsThisRound := 0
+
 	s.round = 1
 	whenToQuit := s.whenToQuit
 	for s.total <= 10000 {
-		if s.round > 50 {
+		if s.round >= 50 {
 			fmt.Printf("No more than 50 rounds plz..\n")
 			break
 		}
 
-		// If we are not in the game yet, go hard!
-		if s.total == 0 && pointsThisRound < 1000 {
-			whenToQuit = 0
-		} else {
-			whenToQuit = s.whenToQuit
-		}
-
 		fmt.Printf("R%v ", s.round)
-		pointsThisRound = s.playRound(whenToQuit)
-
-		// You need 1000 to enter the game
-		if !(s.total == 0 && pointsThisRound > 1000) {
-			s.AddPointsToTotal(pointsThisRound)
-		}
+		s.playRound(whenToQuit)
 
 		s.round++
 	}
@@ -92,7 +81,7 @@ func (s *GameData) playRound(whenToQuit int) int {
 			// If we just got in this round, play it safe and finish up
 			accPoints += rollPoints
 			endRound = true
-		} else if s.total > 1000 && accPoints >= s.minToKeep && remaining <= whenToQuit {
+		} else if s.total >= 1000 && accPoints >= s.minToKeep && remaining <= whenToQuit {
 			// if we are already in, have the minimum we want to keep, and we have fewer die remaining than we need to go on, then end the round
 			accPoints += rollPoints
 			endRound = true
@@ -116,7 +105,7 @@ func (s *GameData) playRound(whenToQuit int) int {
 		}
 	}
 
-	return rollPoints
+	return accPoints
 }
 
 func rollOnce(roll dice) (int, dice, int) {
