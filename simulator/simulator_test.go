@@ -1,6 +1,9 @@
 package simulator
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestIsStraight(t *testing.T) {
 	roll := dice{1, 2, 3, 4, 5, 6}
@@ -189,9 +192,32 @@ func TestCountPoints(t *testing.T) {
 	}
 
 	var sum3 int
-	sum3, rem = getPoints(roll3)
+	sum3, _ = getPoints(roll3)
 	sum += sum3
 	if sum != 2550 {
 		t.Errorf("Sum should now be 2550, was %v after summing", sum)
+	}
+}
+
+func TestOneThousandToEnter(t *testing.T) {
+	var g GameData
+
+	g.SetMinToKeep(5)
+	g.round = 1
+	g.total = 0
+	g.whenToQuit = 3
+
+	if g.minToKeep != 5 {
+		t.Errorf("Min to keep wasn't set to 5")
+	}
+
+	var entry int
+	for entry < 1000 {
+		entry = g.playRound(g.whenToQuit)
+		fmt.Printf("%v\n", entry)
+	}
+
+	if entry > 1000 && g.total < 0 {
+		t.Errorf("Sum was: %v, and total was: %v", entry, g.total)
 	}
 }
