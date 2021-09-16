@@ -8,18 +8,6 @@ import (
 
 func main() {
 	iterate()
-	//playOne()
-}
-
-func playOne() {
-	var s simulator.GameData
-	//s.SetAggressive(0.8)
-	//s.IgnoreTripleTwos(0.5)
-
-	s.SetMinToKeep(0)
-	s.SetWhenToQuit(3)
-	s.PlayRounds()
-	fmt.Printf("Antall runder: %v, sum: %v", s.GetRounds(), s.GetTotalPoints())
 }
 
 func iterate() {
@@ -30,7 +18,7 @@ func iterate() {
 	avgRoundsToWin := 0.0
 	totalRounds := 0
 	counter := 0
-	games := 100
+	games := 1
 
 	for counter < games {
 
